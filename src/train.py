@@ -16,7 +16,7 @@ data = {
         'Highly recommend it!',
         'Terrible quality.'
     ],
-    'label': [1, 0, 1, 0, 1, 0]  # 1 = positive, 0 = negative
+    'label': [1, 0, 1, 0, 1, 0, 1, 0]  # 1 = positive, 0 = negative
 }
 
 df = pd.DataFrame(data)
