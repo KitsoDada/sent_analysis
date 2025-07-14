@@ -9,6 +9,8 @@ data = {
     'text': [
         'I love this product!',
         'This is the worst service ever.',
+        'Good customer service',
+        'Worst food ever',
         'Amazing experience.',
         'I will never buy this again.',
         'Highly recommend it!',
