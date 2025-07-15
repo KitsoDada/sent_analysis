@@ -12,10 +12,26 @@ data = {
         'Amazing experience.',
         'I will never buy this again.',
         'Highly recommend it!',
-        'Terrible quality.'
+        'Terrible quality.',
+        'Bad customer support.',
+        'Good value for money.',
+        'The product broke after one use.',
+        'Fast delivery and great packaging.',
+        'This is disappointing.',
+        'Excellent service.',
+        'Awful, just awful.',
+        'Very bad.',
+        'Not worth the price.',
+        'Best purchase ever!',
+        'Great performance!',
+        'Poorly built and weak.',
+        'Extremely satisfied.',
+        'It does not work.',
     ],
-    'label': [1, 0, 1, 0, 1, 0,]  # 1 = positive, 0 = negative
+    'label': [1, 0, 1, 0, 1, 0, 0, 1, 0, 1,
+              0, 1, 0, 0, 0, 1, 1, 0, 1, 0]
 }
+
 
 df = pd.DataFrame(data)
 
