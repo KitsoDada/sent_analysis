@@ -1,29 +1,14 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import joblib
 
-app = Flask(__name__)
-
-# Load model and vectorizer
 model = joblib.load('app/model.pkl')
 vectorizer = joblib.load('app/vectorizer.pkl')
 
-@app.route('/')
-def home():
-    return 'Sentiment Analysis API is running.'
+st.title("Sentiment Analysis")
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.json
-    text = data.get('text')
-
-    if not text:
-        return jsonify({'error': 'No input text provided'}), 400
-
-    X = vectorizer.transform([text])
-    prediction = model.predict(X)[0]
-    sentiment = 'positive' if prediction == 1 else 'negative'
-
-    return jsonify({'sentiment': sentiment})
-
-if __name__ == '__main__':
-    app.run(debug=True)
+text = st.text_input("Enter your text")
+if st.button("Predict"):
+    vec = vectorizer.transform([text])
+    prediction = model.predict(vec)[0]
+    sentiment = "positive" if prediction == 1 else "negative"
+    st.success(f"Sentiment: {sentiment}")
