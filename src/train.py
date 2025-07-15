@@ -9,14 +9,12 @@ data = {
     'text': [
         'I love this product!',
         'This is the worst service ever.',
-        'Good customer service',
-        'Worst food ever',
         'Amazing experience.',
         'I will never buy this again.',
         'Highly recommend it!',
         'Terrible quality.'
     ],
-    'label': [1, 0, 1, 0, 1, 0, 1, 0]  # 1 = positive, 0 = negative
+    'label': [1, 0, 1, 0, 1, 0,]  # 1 = positive, 0 = negative
 }
 
 df = pd.DataFrame(data)
