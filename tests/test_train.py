@@ -4,12 +4,12 @@ import pytest
 from src.train import model, vectorizer
 
 def test_model_file_exists():
-    assert os.path.exists("model.pkl"), "model.pkl not found"
-    assert os.path.exists("vectorizer.pkl"), "vectorizer.pkl not found"
+    assert os.path.exists("app/model.pkl"), "model.pkl not found"
+    assert os.path.exists("app/vectorizer.pkl"), "vectorizer.pkl not found"
 
 def test_model_prediction():
-    clf = joblib.load("model.pkl")
-    vec = joblib.load("vectorizer.pkl")
+    clf = joblib.load("app/model.pkl")
+    vec = joblib.load("app/vectorizer.pkl")
 
     test_text = ["I hated the experience", "Absolutely wonderful!"]
     X_test = vec.transform(test_text)
