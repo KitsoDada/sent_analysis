@@ -26,10 +26,12 @@ data = {
         'Great performance!',
         'Poorly built and weak.',
         'Extremely satisfied.',
-        'It does not work.',
+        'It does not work',
+        'It is just okay',
+        'need to improve.',
     ],
     'label': [1, 0, 1, 0, 1, 0, 0, 1, 0, 1,
-              0, 1, 0, 0, 0, 1, 1, 0, 1, 0]
+              0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0]
 }
 
 
