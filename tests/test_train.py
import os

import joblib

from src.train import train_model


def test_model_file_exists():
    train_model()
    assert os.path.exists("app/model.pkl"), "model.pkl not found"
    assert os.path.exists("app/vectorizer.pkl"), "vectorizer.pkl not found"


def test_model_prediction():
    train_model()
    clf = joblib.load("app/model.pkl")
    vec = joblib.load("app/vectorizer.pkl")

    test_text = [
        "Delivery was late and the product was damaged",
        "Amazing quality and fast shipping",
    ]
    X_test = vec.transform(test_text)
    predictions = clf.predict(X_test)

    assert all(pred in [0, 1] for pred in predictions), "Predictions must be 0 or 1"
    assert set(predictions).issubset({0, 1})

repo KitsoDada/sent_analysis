@@ -1,0 +1,177 @@
+from pathlib import Path
+
+import joblib
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+APP_DIR = Path(__file__).resolve().parents[1] / "app"
+MODEL_PATH = APP_DIR / "model.pkl"
+VECTORIZER_PATH = APP_DIR / "vectorizer.pkl"
+
+
+def build_ecommerce_review_dataset():
+    data = [
+        {"text": "I love this product. It works perfectly and looks great.", "label": 1},
+        {"text": "Excellent quality and fast delivery. I would definitely order again.", "label": 1},
+        {"text": "The item arrived quickly and was exactly as described.", "label": 1},
+        {"text": "Amazing service, very helpful staff and very easy checkout.", "label": 1},
+        {"text": "Great value for money and the packaging was beautiful.", "label": 1},
+        {"text": "Super fast shipping and the product feels premium.", "label": 1},
+        {"text": "Very satisfied. Product came in perfect condition.", "label": 1},
+        {"text": "Customer service was amazing and resolved my issue quickly.", "label": 1},
+        {"text": "I am extremely happy with the quality and fit.", "label": 1},
+        {"text": "This was the best purchase I have made this year.", "label": 1},
+        {"text": "The product is excellent and the colors are exactly like the photos.", "label": 1},
+        {"text": "Fantastic purchase. It arrived on time and works perfectly.", "label": 1},
+        {"text": "I highly recommend this store and this product.", "label": 1},
+        {"text": "The delivery was fast and the package was well protected.", "label": 1},
+        {"text": "Very easy to use and the quality exceeded my expectations.", "label": 1},
+        {"text": "It fits perfectly and looks just like the listing.", "label": 1},
+        {"text": "I love the design and the material feels durable.", "label": 1},
+        {"text": "Good experience overall, smooth ordering and quick support.", "label": 1},
+        {"text": "I could not be happier. The product is amazing.", "label": 1},
+        {"text": "Great quality, great price, and excellent customer service.", "label": 1},
+        {"text": "I ordered two and both came exactly as expected.", "label": 1},
+        {"text": "Everything was perfect from checkout to delivery.", "label": 1},
+        {"text": "This store is reliable and the item arrived earlier than expected.", "label": 1},
+        {"text": "The product works great and the instructions were clear.", "label": 1},
+        {"text": "The quality is outstanding and the shipping was quick.", "label": 1},
+        {"text": "Amazing value and very friendly support team.", "label": 1},
+        {"text": "I was impressed by the packaging and the speed of delivery.", "label": 1},
+        {"text": "Absolutely love it. The product is sturdy and beautiful.", "label": 1},
+        {"text": "The item arrived with no damage and looks premium.", "label": 1},
+        {"text": "Very pleased with the product and the customer care.", "label": 1},
+        {"text": "Best online shopping experience I have had in months.", "label": 1},
+        {"text": "The seller was responsive and the order arrived on time.", "label": 1},
+        {"text": "This product exceeded expectations and I recommend it.", "label": 1},
+        {"text": "I love the size, quality, and finish. Great product.", "label": 1},
+        {"text": "The product arrived quickly, and I am very happy with it.", "label": 1},
+        {"text": "Fast delivery, easy returns, and amazing quality.", "label": 1},
+        {"text": "Nice product, organized delivery, and helpful support.", "label": 1},
+        {"text": "The item looks better in person and works smoothly.", "label": 1},
+        {"text": "Wonderful experience from purchase to delivery.", "label": 1},
+        {"text": "Really good quality and very trustworthy store.", "label": 1},
+        {"text": "The shipping was extremely quick and the product is perfect.", "label": 1},
+        {"text": "I am so happy with this purchase and the service.", "label": 1},
+        {"text": "The product is great and matched the description exactly.", "label": 1},
+        {"text": "Worst purchase ever. The product arrived broken.", "label": 0},
+        {"text": "Terrible quality. It broke after one day of use.", "label": 0},
+        {"text": "This is a scam. The product looked nothing like the photos.", "label": 0},
+        {"text": "Very disappointed. Shipping took forever and the item was damaged.", "label": 0},
+        {"text": "I hate this product. It is poor quality and expensive.", "label": 0},
+        {"text": "Customer service was rude and unhelpful.", "label": 0},
+        {"text": "The order arrived late and the packaging was horrible.", "label": 0},
+        {"text": "Not worth the money. The material feels cheap.", "label": 0},
+        {"text": "This item does not work and I need a refund.", "label": 0},
+        {"text": "I regret buying this. The quality is awful.", "label": 0},
+        {"text": "The product stopped working after a week.", "label": 0},
+        {"text": "Very bad experience. My order never arrived.", "label": 0},
+        {"text": "The fit was terrible and the size was wrong.", "label": 0},
+        {"text": "Bad customer support and they ignored my messages.", "label": 0},
+        {"text": "The quality is poor and the color is different from the listing.", "label": 0},
+        {"text": "Worst customer service ever. No one helped me.", "label": 0},
+        {"text": "I was charged twice and the delivery took too long.", "label": 0},
+        {"text": "The package arrived damaged and the item looked used.", "label": 0},
+        {"text": "Awful product. It is flimsy and not durable at all.", "label": 0},
+        {"text": "The product arrived late and the seller refused to help.", "label": 0},
+        {"text": "Really disappointed with the quality and finish.", "label": 0},
+        {"text": "This was a waste of money and the delivery was delayed.", "label": 0},
+        {"text": "The item broke immediately and the return process is terrible.", "label": 0},
+        {"text": "I would not recommend this store due to poor service.", "label": 0},
+        {"text": "The product is cheap, uncomfortable, and not as described.", "label": 0},
+        {"text": "They sent the wrong item and did not respond to my email.", "label": 0},
+        {"text": "I am very unhappy with the reliability of this product.", "label": 0},
+        {"text": "The quality is below standard and the shipping was slow.", "label": 0},
+        {"text": "This product is useless and the material feels fake.", "label": 0},
+        {"text": "Terrible experience. The order was delayed for weeks.", "label": 0},
+        {"text": "The packaging was damaged and the product was scratched.", "label": 0},
+        {"text": "I am upset because the item did not match the description.", "label": 0},
+        {"text": "Very poor quality and customer support was dismissive.", "label": 0},
+        {"text": "The size runs small and the quality is disappointing.", "label": 0},
+        {"text": "It arrived late, faulty, and we had to chase support.", "label": 0},
+        {"text": "This product is not worth it; it fell apart after two uses.", "label": 0},
+        {"text": "I hated the experience and will never buy again.", "label": 0},
+        {"text": "The item arrived damaged, and the return process was a nightmare.", "label": 0},
+        {"text": "It looks cheap and the quality is poor.", "label": 0},
+        {"text": "Not happy at all. Shipping was slow and service was bad.", "label": 0},
+        {"text": "The product is fragile and broke on first use.", "label": 0},
+        {"text": "I would not buy from here again. Terrible support.", "label": 0},
+        {"text": "The store misrepresented the product and the item was faulty.", "label": 0},
+        {"text": "Customer care was useless and they never solved my problem.", "label": 0},
+        {"text": "The purchase was disappointing and the quality is subpar.", "label": 0},
+        {"text": "The return took forever, and I got no response from support.", "label": 0},
+        {"text": "I ordered a size large and received a small one.", "label": 0},
+        {"text": "The product arrived in poor condition and looked cheap.", "label": 0},
+        {"text": "The seller was rude, and the item failed within days.", "label": 0},
+        {"text": "Very disappointed with the overall quality and delivery time.", "label": 0},
+        {"text": "Packaging was terrible and the product arrived scratched.", "label": 0},
+        {"text": "The product looked nothing like the pictures, terrible quality.", "label": 0},
+        {"text": "The wire snapped after a few days. Not worth buying.", "label": 0},
+        {"text": "Ordered from this store and it took almost a month to arrive.", "label": 0},
+        {"text": "Maybe okay, but shipping was slow and quality was average.", "label": 1},
+        {"text": "It works fine, though the delivery took a little longer than expected.", "label": 1},
+        {"text": "Decent product, but the packaging could be better.", "label": 1},
+        {"text": "Good enough overall, although I expected stronger materials.", "label": 1},
+        {"text": "The product is fine, but the support response was a little slow.", "label": 1},
+        {"text": "It does the job and the price is fair.", "label": 1},
+        {"text": "Reasonably good quality and the ordering process was easy.", "label": 1},
+        {"text": "Service was okay, but I had to wait for my refund.", "label": 1},
+        {"text": "Acceptable quality and decent shipping speed.", "label": 1},
+        {"text": "Not perfect, but still a solid purchase for the price.", "label": 1},
+        {"text": "The item is okay, though I wish the size guide was clearer.", "label": 1},
+        {"text": "Decent value, and the product works as expected.", "label": 1},
+    ]
+    return pd.DataFrame(data)
+
+
+def train_model():
+    df = build_ecommerce_review_dataset()
+
+    vectorizer = TfidfVectorizer(
+        lowercase=True,
+        ngram_range=(1, 2),
+        min_df=2,
+        strip_accents="unicode",
+        max_features=5000,
+    )
+    X = vectorizer.fit_transform(df["text"].astype(str))
+    y = df["label"].astype(int)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y,
+    )
+
+    model = LogisticRegression(max_iter=2000, class_weight="balanced")
+    model.fit(X_train, y_train)
+
+    APP_DIR.mkdir(exist_ok=True, parents=True)
+    joblib.dump(model, MODEL_PATH)
+    joblib.dump(vectorizer, VECTORIZER_PATH)
+
+    print(f"Model trained and saved to {MODEL_PATH}")
+    print(f"Vectorizer saved to {VECTORIZER_PATH}")
+    print(f"Training accuracy: {model.score(X_train, y_train):.3f}")
+    print(f"Validation accuracy: {model.score(X_test, y_test):.3f}")
+
+    return model, vectorizer
+
+
+model, vectorizer = train_model()
+
+
+if __name__ == "__main__":
+    train_model()
+    print("Review sentiment model ready for ecommerce use.")
+    """
+    Example usage:
+    from src.train import model, vectorizer
+    text = ["Delivery was late and the product was damaged"]
+    prediction = model.predict(vectorizer.transform(text))[0]
+    print("positive" if prediction == 1 else "negative")
+    """
